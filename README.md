@@ -1,30 +1,29 @@
 # wallet
 Proof of concept of a wallet api for an online casino
 
-
-JSON API in Go to get the balance and manage credit/debit operations on players wallets. 
-For example, you might receive calls on your API to get the balance of the wallet with id 123, or to credit the wallet with id 456 by 10.00 €. 
+A JSON API in Go to get the balance and manage credit/debit operations on players wallets. 
+For example, we might receive calls on the API to get the balance of the wallet with id 123, or to credit the wallet with id 456 by 10.00 €. 
 The storage mechanism to use will be MySQL.
 Below are the 3 endpoints to implement, as well as the business rules.
  
 ## Endpoints
 
-- balance : retrieves the balance of a given wallet id  
+- [X] balance : retrieves the balance of a given wallet id  
 GET `/api/v1/wallets/{wallet_id}/balance` 
-- credit : credits money on a given wallet id  
+- [X] credit : credits money on a given wallet id  
 POST `/ api/v1/wallets/{wallet_id}/credit`
-- debit : debits money from a given wallet id  
+- [X] debit : debits money from a given wallet id  
 POST `/ api/v1/wallets/{wallet_id}/debit`
 
 ## Business rules
-- A wallet balance cannot go below 0.
-- Amounts sent in the credit and debit operations cannot be negative.
+- [X] A wallet balance cannot go below 0.
+- [X] Amounts sent in the credit and debit operations cannot be negative.
 
 ## Bonus
-- Cache the wallet balances in Redis, so that they can be fetched from cache
-- Add auth endpoint and authentication verification
-- Add unit tests for the business rules/logic
-- Log the incoming requests
+- [ ] Cache the wallet balances in Redis, so that they can be fetched from cache
+- [ ] Add auth endpoint and authentication verification
+- [X] Add unit tests for the business rules/logic
+- [ ] Log the incoming requests
 
 ## Libraries to use
 - HTTP : https://github.com/gin-gonic/gin

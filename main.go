@@ -1,29 +1,35 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/micuffaro/wallet/internal"
 	"net/http"
 )
 
 // Balance stores the balance to debit or credit
 type Balance struct {
-	Balance int `json:"balance" binding:"required"`
+	Balance float32 `json:"balance" binding:"required"`
 }
 
 func main() {
-	balances := make(map[string]int)
-	balances["123"] = 0
-	balances["456"] = 12
+	// Temporary storage
+	wallets := make(map[string]*wallet.Wallet)
+	wallets["123"] = &wallet.Wallet{
+		ID: "123",
+		Balance: 0.0,
+	}
+	wallets["456"] = &wallet.Wallet{
+		ID: "456",
+		Balance: 12.0,
+	}
 
 	r := gin.Default()
 
 	// Gets the wallet balance
 	r.GET("/api/v1/wallets/:walletid/balance", func(c *gin.Context) {
 		id := c.Param("walletid")
-		balance := fmt.Sprintf("%d", balances[id])
 		c.JSON(http.StatusOK, gin.H{
-			"message": balance,
+			"message": wallets[id].String(),
 		})
 	})
 
@@ -35,7 +41,11 @@ func main() {
 			return
 		}
 		id := c.Param("walletid")
-		balances[id] += json.Balance
+		if err := wallets[id].Credit(json.Balance); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{
 			"message": "ok",
 		})
@@ -48,9 +58,11 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
 		id := c.Param("walletid")
-		balances[id] -= json.Balance
+		if err := wallets[id].Debit(json.Balance); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusOK, gin.H{
 			"message": "ok",
 		})
