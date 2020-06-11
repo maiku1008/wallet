@@ -1,35 +1,49 @@
 package wallet
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/shopspring/decimal"
+)
 
 // New initializes a new wallet
-// func New(id string, balance float32) (*Wallet, error) {
-// 	if balance < 0 {
-// 		return nil, fmt.Errorf("initial wallet balance cannot be negative: %f", balance)
-// 	}
-// 	return &Wallet{
-// 		ID:      id,
-// 		Balance: balance,
-// 	}, nil
-// }
+func New(id, amount string) (*Wallet, error) {
+	balance, err := decimal.NewFromString(amount)
+	if err != nil {
+		return nil, err
+	}
+
+	if balance.IsNegative() {
+		return nil, fmt.Errorf("initial wallet balance cannot be negative: %s", balance.StringFixed(2))
+	}
+
+	return &Wallet{
+		ID:      id,
+		Balance: balance,
+	}, nil
+}
 
 // Wallet represents a wallet with an ID and a current Balance
 type Wallet struct {
 	// Wallet ID
 	ID string
 	// Wallet Balance
-	Balance float32
+	Balance decimal.Decimal
 }
 
 // Debit subtracts an amount from a wallet's balance
-func (w *Wallet) Debit(amount float32) error {
-	if amount < 0 {
-		return fmt.Errorf("amount to debit cannot be negative: %.2f", amount)
+func (w *Wallet) Debit(amount string) error {
+	amountDec, err := decimal.NewFromString(amount)
+	if err != nil {
+		return err
 	}
 
-	total := w.Balance - amount
-	if total < 0 {
-		w.Balance = 0
+	if amountDec.IsNegative() {
+		return fmt.Errorf("amount to debit cannot be negative: %s", amountDec.StringFixed(2))
+	}
+
+	total := w.Balance.Sub(amountDec)
+	if total.IsNegative() {
+		w.Balance = decimal.NewFromInt(0)
 		return nil
 	}
 
@@ -38,14 +52,19 @@ func (w *Wallet) Debit(amount float32) error {
 }
 
 // Credit adds an amount to the wallet's balance
-func (w *Wallet) Credit(amount float32) error {
-	if amount < 0 {
-		return fmt.Errorf("amount to credit cannot be negative: %.2f", amount)
+func (w *Wallet) Credit(amount string) error {
+	amountDec, err := decimal.NewFromString(amount)
+	if err != nil {
+		return err
 	}
-	w.Balance += amount
+
+	if amountDec.IsNegative() {
+		return fmt.Errorf("amount to credit cannot be negative: %s", amountDec.StringFixed(2))
+	}
+	w.Balance = w.Balance.Add(amountDec)
 	return nil
 }
 
-func (w *Wallet) String() string {
-	return fmt.Sprintf("%.2f", w.Balance)
+func (w *Wallet) PrintBalance() string {
+	return w.Balance.StringFixed(2)
 }

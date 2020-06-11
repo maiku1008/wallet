@@ -8,20 +8,14 @@ import (
 
 // Balance stores the balance to debit or credit
 type Balance struct {
-	Balance float32 `json:"balance" binding:"required"`
+	Balance string `json:"balance" binding:"required"`
 }
 
 func main() {
 	// Temporary storage
 	wallets := make(map[string]*wallet.Wallet)
-	wallets["123"] = &wallet.Wallet{
-		ID: "123",
-		Balance: 0.0,
-	}
-	wallets["456"] = &wallet.Wallet{
-		ID: "456",
-		Balance: 12.0,
-	}
+	wallets["123"], _ = wallet.New("123", "0.0")
+	wallets["456"], _ = wallet.New("456", "12.0")
 
 	r := gin.Default()
 
@@ -29,7 +23,7 @@ func main() {
 	r.GET("/api/v1/wallets/:walletid/balance", func(c *gin.Context) {
 		id := c.Param("walletid")
 		c.JSON(http.StatusOK, gin.H{
-			"message": wallets[id].String(),
+			"balance": wallets[id].PrintBalance(),
 		})
 	})
 
