@@ -18,7 +18,7 @@ const (
 
 var (
 	err error
-	service *models.Service
+	service *models.Services
 )
 
 func main() {
@@ -28,20 +28,21 @@ func main() {
 		"%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
 		user, password, dbname,
 	)
-	service, err = models.NewService(mysqlInfo)
+	service, err = models.NewServices(mysqlInfo)
 	if err != nil {
 		panic(err)
 	}
 	defer service.Close()
 	_ = service.AutoMigrate() // Initialize with wallet table
 
-	r := gin.Default()
+	walletC := controllers.NewWalletController(service)
 
+	r := gin.Default()
 	// Gets the wallet balance
 	r.GET(views.EndpointGETBalance, func(c *gin.Context) {
 		var balance decimal.Decimal
 		wid := c.Param("walletid")
-		balance, err = controllers.GetBalance(wid, service)
+		balance, err = walletC.CacheStore.GetBalance(wid)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -59,7 +60,7 @@ func main() {
 			return
 		}
 		wid := c.Param("walletid")
-		err = controllers.Credit(wid, json.Balance, service)
+		err = walletC.Credit(wid, json.Balance)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -78,7 +79,7 @@ func main() {
 			return
 		}
 		wid := c.Param("walletid")
-		err = controllers.Debit(wid, json.Balance, service)
+		err = walletC.Debit(wid, json.Balance)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

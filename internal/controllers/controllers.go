@@ -1,33 +1,52 @@
 package controllers
 
 import (
+	"fmt"
 	wallet "github.com/micuffaro/wallet/internal"
 	"github.com/micuffaro/wallet/internal/models"
 	"github.com/shopspring/decimal"
 )
 
 var (
-	err error
+	err  error
 	mw   *models.Wallet
-	ww  *wallet.Wallet
-	amnt   decimal.Decimal
-	z   = decimal.NewFromInt(0)
+	ww   *wallet.Wallet
+	amnt decimal.Decimal
+	none = decimal.NewFromInt(0)
 )
+
+// NewWalletController initializes a new wallet controller
+func NewWalletController(service *models.Services) *WalletController {
+	return &WalletController{
+		service,
+		models.CacheStore{},
+	}
+}
+
+// WalletController is a controller for wallet operations
+type WalletController struct {
+	*models.Services
+	models.CacheStore
+}
+
+// Assert WalletController implements the models.Store interface
+var _ models.Store = &WalletController{}
 
 // GetBalance fetches from storage the balance of the object identified by wid
 // and returns it
-func GetBalance(wid string, sv *models.Service) (decimal.Decimal, error) {
-	mw, err = sv.Wallet.Get(wid)
+func (wc *WalletController) GetBalance(wid string) (decimal.Decimal, error) {
+	fmt.Println("Fetching from db")
+	mw, err = wc.Wallet.Get(wid)
 	if err != nil {
-		return z, err
+		return none, err
 	}
 
 	return mw.Balance, nil
 }
 
 // Credit fetches from storage the object identified by wid and credits an amount
-func Credit(wid, amount string, sv *models.Service) error {
-	mw, err = sv.Wallet.Get(wid)
+func (wc *WalletController) Credit(wid, amount string) error {
+	mw, err = wc.Wallet.Get(wid)
 	if err != nil {
 		return err
 	}
@@ -47,7 +66,7 @@ func Credit(wid, amount string, sv *models.Service) error {
 	}
 
 	mw.Balance = ww.Balance
-	err = sv.Wallet.Update(mw)
+	err = wc.Wallet.Update(mw)
 	if err != nil {
 		return err
 	}
@@ -56,8 +75,8 @@ func Credit(wid, amount string, sv *models.Service) error {
 }
 
 // Debit fetches from storage the object identified by wid and debits an amount
-func Debit(wid, amount string, sv *models.Service) error {
-	mw, err = sv.Wallet.Get(wid)
+func (wc *WalletController) Debit(wid, amount string) error {
+	mw, err = wc.Wallet.Get(wid)
 	if err != nil {
 		return err
 	}
@@ -77,7 +96,7 @@ func Debit(wid, amount string, sv *models.Service) error {
 	}
 
 	mw.Balance = ww.Balance
-	err = sv.Wallet.Update(mw)
+	err = wc.Wallet.Update(mw)
 	if err != nil {
 		return err
 	}
