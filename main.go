@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/micuffaro/wallet/internal"
+	"github.com/micuffaro/wallet/internal/controllers"
 	"github.com/micuffaro/wallet/internal/models"
 	"github.com/micuffaro/wallet/internal/views"
 	"github.com/shopspring/decimal"
@@ -16,6 +16,11 @@ const (
 	dbname   = "wallet"
 )
 
+var (
+	err error
+	service *models.Service
+)
+
 func main() {
 	// Create a DB connection string and then use it to
 	// create our model services.
@@ -23,50 +28,38 @@ func main() {
 		"%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
 		user, password, dbname,
 	)
-	service, err := models.NewService(mysqlInfo)
+	service, err = models.NewService(mysqlInfo)
 	if err != nil {
 		panic(err)
 	}
 	defer service.Close()
-	service.AutoMigrate() // Initialize with wallet table
+	_ = service.AutoMigrate() // Initialize with wallet table
 
 	r := gin.Default()
 
 	// Gets the wallet balance
 	r.GET(views.EndpointGETBalance, func(c *gin.Context) {
+		var balance decimal.Decimal
 		wid := c.Param("walletid")
-		w, err := service.Wallet.Get(wid)
+		balance, err = controllers.GetBalance(wid, service)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{
-			"balance": w.Balance,
+			"balance": balance,
 		})
 	})
 
 	// Credit
 	r.POST(views.EndpointPOSTCredit, func(c *gin.Context) {
 		var json views.Balance
-		if err := c.ShouldBindJSON(&json); err != nil {
+		if err = c.ShouldBindJSON(&json); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		wid := c.Param("walletid")
-		w, err := service.Wallet.Get(wid)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		ww, _ := wallet.New(w.Balance)
-		amount, err := decimal.NewFromString(json.Balance)
-		if err := ww.Credit(amount); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		w.Balance = ww.Balance
-		err = service.Wallet.Update(w)
+		err = controllers.Credit(wid, json.Balance, service)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -80,25 +73,12 @@ func main() {
 	// Debit
 	r.POST(views.EndpointPOSTDebit, func(c *gin.Context) {
 		var json views.Balance
-		if err := c.ShouldBindJSON(&json); err != nil {
+		if err = c.ShouldBindJSON(&json); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		wid := c.Param("walletid")
-		w, err := service.Wallet.Get(wid)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		ww, _ := wallet.New(w.Balance)
-		amount, err := decimal.NewFromString(json.Balance)
-		if err := ww.Debit(amount); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		w.Balance = ww.Balance
-		err = service.Wallet.Update(w)
+		err = controllers.Debit(wid, json.Balance, service)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -109,5 +89,5 @@ func main() {
 		})
 	})
 
-	r.Run()
+	_ = r.Run()
 }
