@@ -1,24 +1,26 @@
 package wallet
 
 import (
+	"github.com/shopspring/decimal"
 	"testing"
 )
 
-const id = "123"
-
 func TestNew(t *testing.T) {
 	for _, test := range testNewCases {
-		_, err := New(id, test.balance)
+		balance, _ := decimal.NewFromString(test.balance)
+		_, err := New(balance)
 		if err != nil && (err.Error() != test.err.Error()) {
-			t.Fatalf("New(%s, %s): %s\n\t Expected: %t\n\t Got: %t", id, test.balance, test.description, test.err, err)
+			t.Fatalf("New(%s): %s\n\t Expected: %t\n\t Got: %t", test.balance, test.description, test.err, err)
 		}
 	}
 }
 
 func TestCredit(t *testing.T) {
 	for _, test := range testCreditCases {
-		w, _ := New(id, test.balance)
-		err := w.Credit(test.amount)
+		balance, _ := decimal.NewFromString(test.balance)
+		w, _ := New(balance)
+		amount, _ := decimal.NewFromString(test.amount)
+		err := w.Credit(amount)
 		if err != nil && (err.Error() != test.err.Error()) {
 			t.Fatalf("Credit(%s): %s\n\t Expected: %t\n\t Got: %t", test.amount, test.description, test.err, err)
 		}
@@ -31,8 +33,10 @@ func TestCredit(t *testing.T) {
 
 func TestDebit(t *testing.T) {
 	for _, test := range testDebitCases {
-		w, _ := New(id, test.balance)
-		err := w.Debit(test.amount)
+		balance, _ := decimal.NewFromString(test.balance)
+		w, _ := New(balance)
+		amount, _ := decimal.NewFromString(test.amount)
+		err := w.Debit(amount)
 		if err != nil && (err.Error() != test.err.Error()) {
 			t.Fatalf("Debit(%s): %s\n\t Expected: %t\n\t Got: %t", test.amount, test.description, test.err, err)
 		}

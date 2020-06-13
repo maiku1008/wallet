@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/micuffaro/wallet/internal"
 	"github.com/micuffaro/wallet/internal/models"
 	"github.com/micuffaro/wallet/internal/views"
+	"github.com/shopspring/decimal"
 	"net/http"
-	"fmt"
 )
 
 const (
@@ -57,8 +58,9 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		ww, _ := wallet.New(w.WID, w.Balance.String())
-		if err := ww.Credit(json.Balance); err != nil {
+		ww, _ := wallet.New(w.Balance)
+		amount, err := decimal.NewFromString(json.Balance)
+		if err := ww.Credit(amount); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -88,8 +90,9 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		ww, _ := wallet.New(w.WID, w.Balance.String())
-		if err := ww.Debit(json.Balance); err != nil {
+		ww, _ := wallet.New(w.Balance)
+		amount, err := decimal.NewFromString(json.Balance)
+		if err := ww.Debit(amount); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
