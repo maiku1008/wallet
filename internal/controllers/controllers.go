@@ -2,8 +2,8 @@
 package controllers
 
 import (
-	wallet "github.com/micuffaro/wallet/internal"
 	"github.com/micuffaro/wallet/internal/models"
+	"github.com/micuffaro/wallet/internal/wallet"
 	"github.com/shopspring/decimal"
 )
 

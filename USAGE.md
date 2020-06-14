@@ -4,7 +4,7 @@
 - Create a Mysql database `wallet`
 - Change connection strings for db in `main.go:14-16`
 - Init database with some wallets. `go run initdb/init.go`
-- Start application `go run main.go`
+- Start application `go run cmd/wallet.go`
 - Example api calls:
 
 ```
@@ -25,4 +25,4 @@ curl -v -X POST http://localhost:8080/api/v1/wallets/456/debit -H 'content-type:
 and uncommenting the cachestore wrapper in `main.go:42-45`
 
 ### Business rules
-- Business logic is located in `internal/wallet.go`, along with unit tests
+- Business logic is located in `internal/wallet/wallet.go`, along with unit tests
