@@ -14,7 +14,6 @@ var testNewCases = []struct {
 	},
 }
 
-
 var testCreditCases = []struct {
 	description string
 	balance     string

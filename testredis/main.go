@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 )
 
 func main() {
