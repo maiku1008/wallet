@@ -1,4 +1,4 @@
-package models
+package controllers
 
 import (
 	"context"
@@ -17,12 +17,11 @@ type Store interface {
 }
 
 // NewCacheService returns a new cache service object
-func NewCacheService() *CacheService {
+func NewCacheService(addr, pw string, db int) *CacheService {
 	rdb := redis.NewClient(&redis.Options{
-		// Parametrize these at cleanup
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     addr,
+		Password: pw,
+		DB:       db,
 	})
 	return &CacheService{
 		Cache: rdb,
@@ -48,19 +47,19 @@ func (chs *CacheStore) GetBalance(wid string) (decimal.Decimal, error) {
 	switch {
 	case err == redis.Nil:
 		// Not found in cache
-		var b decimal.Decimal
+		var bal decimal.Decimal
 		// Get the balance from storage
-		b, err = chs.Store.GetBalance(wid)
+		bal, err = chs.Store.GetBalance(wid)
 		if err != nil {
 			return none, err
 		}
 
 		// Set wid and balance in cache
-		err = chs.Cache.Set(ctx, wid, b.StringFixed(2), 0).Err()
+		err = chs.Cache.Set(ctx, wid, bal.StringFixed(2), 0).Err()
 		if err != nil {
 			return none, err
 		}
-		return b, nil
+		return bal, nil
 	case err != nil:
 		// Some error
 		return none, err

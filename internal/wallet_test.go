@@ -25,8 +25,8 @@ func TestCredit(t *testing.T) {
 			t.Fatalf("Credit(%s): %s\n\t Expected: %t\n\t Got: %t", test.amount, test.description, test.err, err)
 		}
 
-		if w.PrintBalance() != test.newBalance {
-			t.Fatalf("Credit(%s): %s\n\t Expected: %s\n\t Got: %s", test.amount, test.description, test.newBalance, w.PrintBalance())
+		if w.printBalance() != test.newBalance {
+			t.Fatalf("Credit(%s): %s\n\t Expected: %s\n\t Got: %s", test.amount, test.description, test.newBalance, w.printBalance())
 		}
 	}
 }
@@ -40,8 +40,8 @@ func TestDebit(t *testing.T) {
 		if err != nil && (err.Error() != test.err.Error()) {
 			t.Fatalf("Debit(%s): %s\n\t Expected: %t\n\t Got: %t", test.amount, test.description, test.err, err)
 		}
-		if w.PrintBalance() != test.newBalance {
-			t.Fatalf("Debit(%s): %s\n\t Expected: %st\n\t Got: %s", test.amount, test.description, test.newBalance, w.PrintBalance())
+		if w.printBalance() != test.newBalance {
+			t.Fatalf("Debit(%s): %s\n\t Expected: %st\n\t Got: %s", test.amount, test.description, test.newBalance, w.printBalance())
 		}
 	}
 }

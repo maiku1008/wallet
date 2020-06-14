@@ -39,10 +39,10 @@ func (s *DBService) AutoMigrate() error {
 }
 
 // DestructiveReset drops all tables and rebuilds them
-func (s *DBService) DestructiveReset() error {
-	err := s.db.DropTableIfExists(&Wallet{}).Error
-	if err != nil {
-		return err
-	}
-	return s.AutoMigrate()
-}
+// func (s *DBService) DestructiveReset() error {
+// 	err := s.db.DropTableIfExists(&Wallet{}).Error
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return s.AutoMigrate()
+// }

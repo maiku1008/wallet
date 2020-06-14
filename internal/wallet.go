@@ -1,3 +1,4 @@
+// Package wallet defines the business rules of our application
 package wallet
 
 import (
@@ -47,6 +48,7 @@ func (w *Wallet) Credit(amount decimal.Decimal) error {
 	return nil
 }
 
-func (w *Wallet) PrintBalance() string {
+// PrintBalance prints the objects balance in string form
+func (w *Wallet) printBalance() string {
 	return w.Balance.StringFixed(2)
 }

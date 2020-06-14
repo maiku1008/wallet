@@ -1,3 +1,4 @@
+// Package controllers exposes a controller that connects business rules and models
 package controllers
 
 import (
@@ -15,22 +16,22 @@ var (
 )
 
 // NewWalletController initializes a new wallet controller
-func NewWalletController(service *models.DBService) *walletController {
-	return &walletController{
+func NewWalletController(service *models.DBService) *WalletController {
+	return &WalletController{
 		service,
 	}
 }
 
-// walletController is a controller for wallet operations
-type walletController struct {
+// WalletController is a controller for wallet operations
+type WalletController struct {
 	*models.DBService
 }
 
-var _ models.Store = &walletController{}
+var _ Store = &WalletController{}
 
 // GetBalance fetches from storage the balance of the object identified by wid
 // and returns it
-func (wc *walletController) GetBalance(wid string) (decimal.Decimal, error) {
+func (wc *WalletController) GetBalance(wid string) (decimal.Decimal, error) {
 	mw, err = wc.Wallet.Get(wid)
 	if err != nil {
 		return none, err
@@ -40,7 +41,7 @@ func (wc *walletController) GetBalance(wid string) (decimal.Decimal, error) {
 }
 
 // Credit fetches from storage the object identified by wid and credits an amount
-func (wc *walletController) Credit(wid, amount string) (decimal.Decimal, error) {
+func (wc *WalletController) Credit(wid, amount string) (decimal.Decimal, error) {
 	mw, err = wc.Wallet.Get(wid)
 	if err != nil {
 		return none, err
@@ -70,7 +71,7 @@ func (wc *walletController) Credit(wid, amount string) (decimal.Decimal, error) 
 }
 
 // Debit fetches from storage the object identified by wid and debits an amount
-func (wc *walletController) Debit(wid, amount string) (decimal.Decimal, error) {
+func (wc *WalletController) Debit(wid, amount string) (decimal.Decimal, error) {
 	mw, err = wc.Wallet.Get(wid)
 	if err != nil {
 		return none, err

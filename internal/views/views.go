@@ -1,3 +1,4 @@
+// Package views exports some resources used for setting up views
 package views
 
 const (

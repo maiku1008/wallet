@@ -11,9 +11,12 @@ import (
 )
 
 const (
-	user     = "root"
-	password = "pippo123"
-	dbname   = "wallet"
+	dbuser        = "root"
+	dbpassword    = ""
+	dbname        = "wallet"
+	cacheserver   = "localhost:6379"
+	cachepassword = ""
+	cachedb       = 0
 )
 
 var (
@@ -26,7 +29,7 @@ func main() {
 	// create our model services.
 	mysqlInfo := fmt.Sprintf(
 		"%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
-		user, password, dbname,
+		dbuser, dbpassword, dbname,
 	)
 	service, err = models.NewDBService(mysqlInfo)
 	if err != nil {
@@ -39,8 +42,8 @@ func main() {
 	// walletC := controllers.NewWalletController(service)
 
 	// Wallet controller that uses a cache service on top of underlying storage
-	walletC := &models.CacheStore{
-		models.NewCacheService(),
+	walletC := &controllers.CacheStore{
+		controllers.NewCacheService(cacheserver, cachepassword, cachedb),
 		controllers.NewWalletController(service),
 	}
 

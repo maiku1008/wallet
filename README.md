@@ -1,7 +1,7 @@
 # wallet
 Proof of concept of a wallet api for an online casino
 
-A JSON API in Go to get the balance and manage credit/debit operations on players wallets. 
+We want to write a JSON API in Go to get the balance and manage credit/debit operations on players wallets. 
 For example, we might receive calls on the API to get the balance of the wallet with id 123, or to credit the wallet with id 456 by 10.00 €. 
 The storage mechanism to use will be MySQL.
 Below are the 3 endpoints to implement, as well as the business rules.
@@ -20,7 +20,7 @@ POST `/ api/v1/wallets/{wallet_id}/debit`
 - [X] Amounts sent in the credit and debit operations cannot be negative.
 
 ## Bonus
-- [ ] Cache the wallet balances in Redis, so that they can be fetched from cache
+- [X] Cache the wallet balances in Redis, so that they can be fetched from cache
 - [ ] Add auth endpoint and authentication verification
 - [X] Add unit tests for the business rules/logic
 - [ ] Log the incoming requests
