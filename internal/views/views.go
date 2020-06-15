@@ -24,8 +24,8 @@ var (
 	err     error
 )
 
-// Balance stores the incoming balance to debit or credit
-type Balance struct {
+// req stores the incoming balance to debit or credit
+type req struct {
 	Balance string `json:"balance" binding:"required"`
 }
 
@@ -69,7 +69,7 @@ func (h *Handlers) NewGetBalanceHandler() func(c *gin.Context) {
 func (h *Handlers) NewPostCreditHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		wid := c.Param(walletParam)
-		var json Balance
+		var json req
 		if err = c.ShouldBindJSON(&json); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -98,7 +98,7 @@ func (h *Handlers) NewPostCreditHandler() func(c *gin.Context) {
 func (h *Handlers) NewPostDebitHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		wid := c.Param(walletParam)
-		var json Balance
+		var json req
 		if err = c.ShouldBindJSON(&json); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

@@ -27,7 +27,7 @@ type walletGorm struct {
 	db *gorm.DB
 }
 
-// Get query the db for an object with the given wid
+// Get queries the db for an object with the given wid
 func (wg *walletGorm) Get(wid string) (*Wallet, error) {
 	var wallet Wallet
 	db := wg.db.Where("w_id = ?", wid)

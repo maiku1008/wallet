@@ -27,11 +27,13 @@ type WalletController struct {
 	*models.DBService
 }
 
+// Assert WalletController implements Store
 var _ Store = &WalletController{}
 
 // GetBalance fetches from storage the balance of the object identified by wid
 // and returns it
 func (wc *WalletController) GetBalance(wid string) (decimal.Decimal, error) {
+	// Find the model object in storage
 	mw, err = wc.Wallet.Get(wid)
 	if err != nil {
 		return none, err
@@ -42,25 +44,31 @@ func (wc *WalletController) GetBalance(wid string) (decimal.Decimal, error) {
 
 // Credit fetches from storage the object identified by wid and credits an amount
 func (wc *WalletController) Credit(wid, amount string) (decimal.Decimal, error) {
+	// Find the model object in storage
 	mw, err = wc.Wallet.Get(wid)
 	if err != nil {
 		return none, err
 	}
 
+	// Create a new wallet.Wallet object from it
 	ww, err = wallet.New(mw.Balance)
 	if err != nil {
 		return none, err
 	}
 
+	// Convert the string amount to decimal.Decimal
 	amnt, err = decimal.NewFromString(amount)
 	if err != nil {
 		return none, err
 	}
 
-	if err = ww.Credit(amnt); err != nil {
+	// Credit the amount
+	err = ww.Credit(amnt)
+	if err != nil {
 		return none, err
 	}
 
+	// Update the amount in storage
 	mw.Balance = ww.Balance
 	err = wc.Wallet.Update(mw)
 	if err != nil {
@@ -72,25 +80,31 @@ func (wc *WalletController) Credit(wid, amount string) (decimal.Decimal, error) 
 
 // Debit fetches from storage the object identified by wid and debits an amount
 func (wc *WalletController) Debit(wid, amount string) (decimal.Decimal, error) {
+	// Find the model object in storage
 	mw, err = wc.Wallet.Get(wid)
 	if err != nil {
 		return none, err
 	}
 
+	// Create a new wallet.Wallet object from it
 	ww, err = wallet.New(mw.Balance)
 	if err != nil {
 		return none, err
 	}
 
+	// Convert the string amount to decimal.Decimal
 	amnt, err = decimal.NewFromString(amount)
 	if err != nil {
 		return none, err
 	}
 
-	if err = ww.Debit(amnt); err != nil {
+	// Credit the amount
+	err = ww.Debit(amnt)
+	if err != nil {
 		return none, err
 	}
 
+	// Update the amount in storage
 	mw.Balance = ww.Balance
 	err = wc.Wallet.Update(mw)
 	if err != nil {

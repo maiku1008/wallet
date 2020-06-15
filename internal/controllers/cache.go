@@ -3,8 +3,11 @@ package controllers
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
+	"github.com/micuffaro/wallet/internal/wallet"
 	"github.com/shopspring/decimal"
 )
+
+const cacheSeconds = 0
 
 var ctx = context.TODO()
 
@@ -55,7 +58,7 @@ func (chs *CacheStore) GetBalance(wid string) (decimal.Decimal, error) {
 		}
 
 		// Set wid and balance in cache
-		err = chs.Cache.Set(ctx, wid, bal.StringFixed(2), 0).Err()
+		err = chs.Cache.Set(ctx, wid, bal.StringFixed(wallet.Fixed), cacheSeconds).Err()
 		if err != nil {
 			return none, err
 		}
@@ -81,7 +84,7 @@ func (chs *CacheStore) Credit(wid, amount string) (decimal.Decimal, error) {
 	}
 
 	// Update the cache
-	err = chs.Cache.Set(ctx, wid, bal.StringFixed(2), 0).Err()
+	err = chs.Cache.Set(ctx, wid, bal.StringFixed(wallet.Fixed), cacheSeconds).Err()
 	if err != nil {
 		return none, err
 	}
@@ -98,7 +101,7 @@ func (chs *CacheStore) Debit(wid, amount string) (decimal.Decimal, error) {
 	}
 
 	// Update the cache
-	err = chs.Cache.Set(ctx, wid, bal.StringFixed(2), 0).Err()
+	err = chs.Cache.Set(ctx, wid, bal.StringFixed(wallet.Fixed), cacheSeconds).Err()
 	if err != nil {
 		return none, err
 	}

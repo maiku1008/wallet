@@ -2,11 +2,6 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/shopspring/decimal"
-)
-
-var (
-	none = decimal.NewFromInt(0)
 )
 
 // NewDBService handles the database connection

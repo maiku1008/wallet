@@ -6,10 +6,13 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+// Fixed is the number of decimal points we want to display
+const Fixed = 2
+
 // New initializes a new wallet
 func New(balance decimal.Decimal) (*Wallet, error) {
 	if balance.IsNegative() {
-		return nil, fmt.Errorf("initial wallet balance cannot be negative: %s", balance.StringFixed(2))
+		return nil, fmt.Errorf("initial wallet balance cannot be negative: %s", balance.StringFixed(Fixed))
 	}
 
 	return &Wallet{
@@ -26,12 +29,12 @@ type Wallet struct {
 // Debit subtracts an amount from a wallet's balance
 func (w *Wallet) Debit(amount decimal.Decimal) error {
 	if amount.IsNegative() {
-		return fmt.Errorf("amount to debit cannot be negative: %s", amount.StringFixed(2))
+		return fmt.Errorf("amount to debit cannot be negative: %s", amount.StringFixed(Fixed))
 	}
 
 	total := w.Balance.Sub(amount)
 	if total.IsNegative() {
-		w.Balance = decimal.NewFromInt(0)
+		w.Balance = decimal.NewFromInt(0) // Choose to set to 0 instead of returning error
 		return nil
 	}
 
@@ -42,7 +45,7 @@ func (w *Wallet) Debit(amount decimal.Decimal) error {
 // Credit adds an amount to the wallet's balance
 func (w *Wallet) Credit(amount decimal.Decimal) error {
 	if amount.IsNegative() {
-		return fmt.Errorf("amount to credit cannot be negative: %s", amount.StringFixed(2))
+		return fmt.Errorf("amount to credit cannot be negative: %s", amount.StringFixed(Fixed))
 	}
 	w.Balance = w.Balance.Add(amount)
 	return nil
@@ -50,5 +53,5 @@ func (w *Wallet) Credit(amount decimal.Decimal) error {
 
 // PrintBalance prints the objects balance in string form
 func (w *Wallet) printBalance() string {
-	return w.Balance.StringFixed(2)
+	return w.Balance.StringFixed(Fixed)
 }
