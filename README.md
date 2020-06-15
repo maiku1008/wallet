@@ -23,7 +23,7 @@ POST `/ api/v1/wallets/{wallet_id}/debit`
 - [X] Cache the wallet balances in Redis, so that they can be fetched from cache
 - [ ] Add auth endpoint and authentication verification
 - [X] Add unit tests for the business rules/logic
-- [ ] Log the incoming requests
+- [X] Log the incoming requests
 
 ## Libraries to use
 - HTTP : https://github.com/gin-gonic/gin

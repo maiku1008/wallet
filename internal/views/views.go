@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/micuffaro/wallet/internal/controllers"
 	"github.com/shopspring/decimal"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -28,11 +29,32 @@ type Balance struct {
 	Balance string `json:"balance" binding:"required"`
 }
 
+// NewHandlers returns a new Handlers object
+func NewHandlers(logger *logrus.Logger, cs controllers.Store) *Handlers {
+	return &Handlers{
+		logger,
+		cs,
+	}
+}
+
+// Handlers contains resources to pass to Handlers
+type Handlers struct {
+	logger *logrus.Logger
+	controllers.Store
+}
+
 // NewGetBalanceHandler returns a handler for the GetBalance endpoint
-func NewGetBalanceHandler(cs controllers.Store) func(c *gin.Context) {
+func (h *Handlers) NewGetBalanceHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		wid := c.Param(walletParam)
-		balance, err = cs.GetBalance(wid)
+
+		// Log the request
+		h.logger.WithFields(logrus.Fields{
+			"method": "GET",
+			"wid":    wid,
+		}).Info("GET Balance request")
+
+		balance, err = h.GetBalance(wid)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -44,15 +66,23 @@ func NewGetBalanceHandler(cs controllers.Store) func(c *gin.Context) {
 }
 
 // NewPostCreditHandler returns a handler for the PostCredit endpoint
-func NewPostCreditHandler(cs controllers.Store) func(c *gin.Context) {
+func (h *Handlers) NewPostCreditHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
+		wid := c.Param(walletParam)
 		var json Balance
 		if err = c.ShouldBindJSON(&json); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		wid := c.Param("walletid")
-		_, err = cs.Credit(wid, json.Balance)
+
+		// Log the request
+		h.logger.WithFields(logrus.Fields{
+			"method": "POST",
+			"wid":    wid,
+			"amount": json.Balance,
+		}).Info("POST Credit request")
+
+		_, err = h.Credit(wid, json.Balance)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -65,15 +95,23 @@ func NewPostCreditHandler(cs controllers.Store) func(c *gin.Context) {
 }
 
 // NewPostDebitHandler returns a handler for the PostDebit endpoint
-func NewPostDebitHandler(cs controllers.Store) func(c *gin.Context) {
+func (h *Handlers) NewPostDebitHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
+		wid := c.Param(walletParam)
 		var json Balance
 		if err = c.ShouldBindJSON(&json); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		wid := c.Param("walletid")
-		_, err = cs.Debit(wid, json.Balance)
+
+		// Log the request
+		h.logger.WithFields(logrus.Fields{
+			"method": "POST",
+			"wid":    wid,
+			"amount": json.Balance,
+		}).Info("POST Debit request")
+
+		_, err = h.Debit(wid, json.Balance)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
