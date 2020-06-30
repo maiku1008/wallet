@@ -14,7 +14,6 @@ func New(balance decimal.Decimal) (*Wallet, error) {
 	if balance.IsNegative() {
 		return nil, fmt.Errorf("initial wallet balance cannot be negative: %s", balance.StringFixed(Fixed))
 	}
-
 	return &Wallet{
 		Balance: balance,
 	}, nil
@@ -31,13 +30,10 @@ func (w *Wallet) Debit(amount decimal.Decimal) error {
 	if amount.IsNegative() {
 		return fmt.Errorf("amount to debit cannot be negative: %s", amount.StringFixed(Fixed))
 	}
-
 	total := w.Balance.Sub(amount)
 	if total.IsNegative() {
-		w.Balance = decimal.NewFromInt(0) // Choose to set to 0 instead of returning error
-		return nil
+		return fmt.Errorf("debit operation with amount %s returns negative balance", amount.StringFixed(Fixed))
 	}
-
 	w.Balance = total
 	return nil
 }

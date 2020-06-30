@@ -59,17 +59,17 @@ var testDebitCases = []struct {
 		nil,
 	},
 	{
-		"Balance doesn't go negative",
-		"50.00",
-		"60.00",
-		"0.00",
-		nil,
-	},
-	{
 		"Amount to debit is negative",
 		"0.00",
 		"-10.00",
 		"0.00",
 		errors.New("amount to debit cannot be negative: -10.00"),
+	},
+	{
+		"Debit operation leads to negative balance",
+		"5.00",
+		"10.00",
+		"5.00",
+		errors.New("debit operation with amount 10.00 returns negative balance"),
 	},
 }
