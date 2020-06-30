@@ -47,7 +47,6 @@ type Handlers struct {
 func (h *Handlers) NewGetBalanceHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		wid := c.Param(walletParam)
-
 		// Log the request
 		h.logger.WithFields(logrus.Fields{
 			"method": "GET",
@@ -69,25 +68,22 @@ func (h *Handlers) NewGetBalanceHandler() func(c *gin.Context) {
 func (h *Handlers) NewPostCreditHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		wid := c.Param(walletParam)
+		// Log the request
+		h.logger.WithFields(logrus.Fields{
+			"method": "POST",
+			"wid":    wid,
+		}).Info("POST Credit request")
+
 		var json req
 		if err = c.ShouldBindJSON(&json); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
-		// Log the request
-		h.logger.WithFields(logrus.Fields{
-			"method": "POST",
-			"wid":    wid,
-			"amount": json.Balance,
-		}).Info("POST Credit request")
-
 		_, err = h.Credit(wid, json.Balance)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
 		c.JSON(http.StatusOK, gin.H{
 			"message": "ok",
 		})
@@ -98,25 +94,22 @@ func (h *Handlers) NewPostCreditHandler() func(c *gin.Context) {
 func (h *Handlers) NewPostDebitHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
 		wid := c.Param(walletParam)
+		// Log the request
+		h.logger.WithFields(logrus.Fields{
+			"method": "POST",
+			"wid":    wid,
+		}).Info("POST Debit request")
+
 		var json req
 		if err = c.ShouldBindJSON(&json); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
-		// Log the request
-		h.logger.WithFields(logrus.Fields{
-			"method": "POST",
-			"wid":    wid,
-			"amount": json.Balance,
-		}).Info("POST Debit request")
-
 		_, err = h.Debit(wid, json.Balance)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
 		c.JSON(http.StatusOK, gin.H{
 			"message": "ok",
 		})
